@@ -39,10 +39,11 @@ class HaberRepository {
         const query = {};
         if (filters.category && filters.category !== 'Hepsi') query.category = filters.category;
         
-        // Tarih filtresi (Son X gün)
+        // Tarih filtresi: Son X gün (Saate göre dinamik pencere)
         if (filters.days) {
             const dateLimit = new Date();
-            dateLimit.setDate(dateLimit.getDate() - filters.days);
+            // 1 gün = 24 saat geriye git
+            dateLimit.setHours(dateLimit.getHours() - (filters.days * 24));
             query.publishedDate = { $gte: dateLimit };
         }
 

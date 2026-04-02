@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { RefreshCw, MapPin, Calendar, ExternalLink, Filter } from 'lucide-react';
+import { RefreshCw, MapPin, Calendar, ExternalLink, Filter, Clock } from 'lucide-react';
 import axios from 'axios';
 
 const containerStyle = { width: '100%', height: '100vh' };
 const center = { lat: 40.7654, lng: 29.9408 };
 
-// Kategoriler için standart Google Maps renkleri
 const categoryConfig = {
   'Cinayet': { color: 'purple', icon: '💀', hex: '#a855f7' },
   'Yangın': { color: 'orange', icon: '🔥', hex: '#f97316' },
@@ -27,15 +26,16 @@ function App() {
   const [selectedNews, setSelectedNews] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filterCategory, setFilterCategory] = useState('Hepsi');
+  const [daysFilter, setDaysFilter] = useState(3); // Yeni Tarih Filtresi State'i
 
   const fetchNews = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/haberler?category=${filterCategory === 'Hepsi' ? '' : filterCategory}`);
+      const response = await axios.get(`/api/haberler?category=${filterCategory === 'Hepsi' ? '' : filterCategory}&days=${daysFilter}`);
       setNews(response.data);
     } catch (err) {
       console.error("Haberler yüklenirken hata:", err);
     }
-  }, [filterCategory]);
+  }, [filterCategory, daysFilter]);
 
   useEffect(() => {
     fetchNews();
@@ -65,7 +65,7 @@ function App() {
 
         <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '12px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-            <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>Veri Güncelleme</span>
+            <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>Veri Kaynaklarını Tara</span>
             <button 
               onClick={handleUpdate} 
               disabled={loading}
@@ -75,17 +75,43 @@ function App() {
               {loading ? 'Yükleniyor' : 'Güncelle'}
             </button>
           </div>
-          <select 
-            value={filterCategory} 
-            onChange={(e) => setFilterCategory(e.target.value)}
-            style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-          >
-            <option value="Hepsi">Tüm Kategoriler</option>
-            {Object.keys(categoryConfig).map(cat => <option key={cat} value={cat}>{cat}</option>)}
-          </select>
+
+          {/* Tarih Slider Filtresi */}
+          <div style={{ marginBottom: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Clock size={14} /> Zaman Aralığı
+              </label>
+              <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#2563eb' }}>Son {daysFilter} Gün</span>
+            </div>
+            <input 
+              type="range" min="1" max="3" step="1"
+              value={daysFilter}
+              onChange={(e) => setDaysFilter(parseInt(e.target.value))}
+              style={{ width: '100%', cursor: 'pointer', accentColor: '#2563eb' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#94a3b8', marginTop: '4px' }}>
+              <span>24 Saat</span>
+              <span>48 Saat</span>
+              <span>72 Saat</span>
+            </div>
+          </div>
+          
+          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '15px' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '8px' }}>Kategori Filtrele</label>
+            <select 
+              value={filterCategory} 
+              onChange={(e) => setFilterCategory(e.target.value)}
+              style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+            >
+              <option value="Hepsi">Tüm Kategoriler</option>
+              {Object.keys(categoryConfig).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
+          </div>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
+          <h3 style={{ fontSize: '0.8rem', fontWeight: '800', color: '#94a3b8', marginBottom: '12px', letterSpacing: '0.05em' }}>LISTELENEN HABERLER ({news.length})</h3>
           {news.map((item) => (
             <div 
               key={item._id} 
@@ -101,7 +127,7 @@ function App() {
                 </span>
                 <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{new Date(item.publishedDate).toLocaleDateString('tr-TR')}</span>
               </div>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{item.title}</div>
+              <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#1e293b' }}>{item.title}</div>
             </div>
           ))}
         </div>
