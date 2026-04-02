@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Query
 from scrapers.ses_kocaeli import SesKocaeliScraper
 from scrapers.ozgur_kocaeli import OzgurKocaeliScraper
+from scrapers.cagdas_kocaeli import CagdasKocaeliScraper
+from scrapers.yeni_kocaeli import YeniKocaeliScraper
 from nlp.processor import NLPProcessor
 from utils.cleaner import Cleaner
 import uvicorn
@@ -8,20 +10,21 @@ import os
 import json
 from typing import List, Dict
 
-app = FastAPI(title="Kentsel Haber NLP Worker - Dual Source (Ses + Özgür)")
+app = FastAPI(title="Kentsel Haber NLP Worker - Full Source Edition")
 
 processor = NLPProcessor()
 cleaner = Cleaner()
 
-@app.get("/health")
-def health_check():
-    return {"status": "UP", "sources": ["Ses Kocaeli", "Özgür Kocaeli"]}
-
 @app.post("/process-news")
-async def process_news(days: int = Query(3, ge=1, le=3)):
+async def process_news(days: int = Query(3, ge=1, le=10)):
     all_raw_news = []
-    # Çağdaş bloklu olduğu için şimdilik çıkarıldı, Özgür eklendi
-    scrapers = [SesKocaeliScraper(), OzgurKocaeliScraper()]
+    # TÜM KAYNAKLAR LİSTEDE
+    scrapers = [
+        SesKocaeliScraper(), 
+        OzgurKocaeliScraper(), 
+        CagdasKocaeliScraper(), 
+        YeniKocaeliScraper()
+    ]
     
     print(f"\n[Worker] {len(scrapers)} haber kaynağı taranıyor (Son {days} gün)...")
     
@@ -49,9 +52,9 @@ async def process_news(days: int = Query(3, ge=1, le=3)):
         news['category'] = processor.classify(news['title'], news['content'])
         processed_stage_1.append(news)
         
-    print(f"[Worker] Lokalite filtresinden geçen haber sayısı: {len(processed_stage_1)}")
+    print(f"[Worker] Lokalite filtresinden geçen: {len(processed_stage_1)}")
 
-    # 2. Benzerlik Analizi ve Tekilleştirme (Threshold: %75)
+    # 2. Benzerlik Analizi ve Tekilleştirme
     final_results, merge_logs = processor.check_similarity(processed_stage_1, threshold=0.75)
     
     # Başarılı birleşmeleri logla
@@ -60,7 +63,7 @@ async def process_news(days: int = Query(3, ge=1, le=3)):
     with open(os.path.join(log_dir, "successful_merges.json"), "w", encoding="utf-8") as f:
         json.dump(merge_logs, f, ensure_ascii=False, indent=4)
 
-    print(f"[Worker] Tekilleştirme bitti. {len(merge_logs)} olay birleştirildi.")
+    print(f"[Worker] İşlem bitti. {len(final_results)} tekil olay.")
     
     return {
         "status": "success",

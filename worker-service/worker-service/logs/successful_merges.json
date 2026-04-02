@@ -1,1 +1,134 @@
-[]
+[
+    {
+        "score": 1.0,
+        "news_a": {
+            "title": "Başiskele Kart uygulaması 4 bine yakın kullanıcıya ulaştı",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Başiskele Kart uygulaması 4 bine yakın kullanıcıya ulaştı",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 1.0,
+        "news_a": {
+            "title": "Gebze'de çöken bina için yeni rapor",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Gebze'de çöken bina için yeni rapor",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.8609,
+        "news_a": {
+            "title": "Çiğdem Öğretmen'den acı haber!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "İzmit'te görev yapan öğretmenden kahreden haber!",
+            "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 1.0,
+        "news_a": {
+            "title": "Kocaeli'nin fazla suyu Sapanca Gölü'ne gönderiliyor",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Kocaeli'nin fazla suyu Sapanca Gölü'ne gönderiliyor",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.7732,
+        "news_a": {
+            "title": "Gölcük’te iki ortaokul öğrencisi aranıyor!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Değirmendere’de iki kız çocuğu kayıp",
+            "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 0.7543,
+        "news_a": {
+            "title": "Öz abisi tarafından öldürülmüş!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Tırın altındaki kasklı katil ağabeyi çıktı",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.8425,
+        "news_a": {
+            "title": "6 yaşındaki Ela'nın öldüğü servis kazasında, küçük kız 'asli' kusurlu bulundu",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "6 yaşındaki Ela'nın öldüğü kazada sürücü 'tali', küçük kız 'asli' kusurlu bulundu",
+            "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 0.8671,
+        "news_a": {
+            "title": "6 yaşındaki Ela'nın öldüğü servis kazasında, küçük kız 'asli' kusurlu bulundu",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "6 yaşındaki Ela'nın öldüğü servis kazasında sürücü 'tali', küçük kız 'asli' kusurlu bulundu",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.7851,
+        "news_a": {
+            "title": "Sokakta hareketsiz yatan şahsın hayatını kaybettiği belirlendi!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Öz kardeşini pusu kurup öldürdü!",
+            "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 0.7939,
+        "news_a": {
+            "title": "Sokakta hareketsiz yatan şahsın hayatını kaybettiği belirlendi!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Kocaeli’de korkunç cinayet! Cesedi bulundu",
+            "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 0.8179,
+        "news_a": {
+            "title": "İzmit’te dev kütük arabanın camına saplandı!",
+            "site": "Özgür Kocaeli"
+        },
+        "news_b": {
+            "title": "Kamyondan düşen tomruk seyir halindeki otomobile saplandı",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 1.0,
+        "news_a": {
+            "title": "“Ortak Akılla Daha Güçlü Derince”",
+            "site": "Yeni Kocaeli"
+        },
+        "news_b": {
+            "title": "“Ortak Akılla Daha Güçlü Derince”",
+            "site": "Yeni Kocaeli"
+        }
+    }
+]
