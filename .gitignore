@@ -1,0 +1,22 @@
+# Environment Variables
+.env
+api-gateway/.env
+frontend/.env
+worker-service/.env
+
+# Dependencies
+node_modules/
+api-gateway/node_modules/
+frontend/node_modules/
+worker-service/venv/
+worker-service/__pycache__/
+worker-service/nlp/__pycache__/
+worker-service/scrapers/__pycache__/
+worker-service/utils/__pycache__/
+
+# Build / IDE
+dist/
+.vscode/
+.idea/
+.DS_Store
+*.log
