@@ -7,3 +7,4 @@ sentence-transformers==3.0.1
 pandas==2.2.2
 python-dotenv==1.0.1
 pytz==2024.1
+python-dateutil==2.9.0

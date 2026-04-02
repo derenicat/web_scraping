@@ -1,37 +1,29 @@
 from fastapi import FastAPI, Query
-from scrapers.ozgur_kocaeli import OzgurKocaeliScraper
-from scrapers.cagdas_kocaeli import CagdasKocaeliScraper
 from scrapers.ses_kocaeli import SesKocaeliScraper
-from scrapers.yeni_kocaeli import YeniKocaeliScraper
-from scrapers.bizim_yaka import BizimYakaScraper
+from scrapers.ozgur_kocaeli import OzgurKocaeliScraper
 from nlp.processor import NLPProcessor
 from utils.cleaner import Cleaner
 import uvicorn
+import os
+import json
+from typing import List, Dict
 
-app = FastAPI(title="Kentsel Haber NLP Worker")
+app = FastAPI(title="Kentsel Haber NLP Worker - Dual Source (Ses + Özgür)")
 
-# Servisler yüklendiğinde modeller belleğe alınır
 processor = NLPProcessor()
 cleaner = Cleaner()
 
 @app.get("/health")
 def health_check():
-    return {"status": "UP", "service": "Python Worker"}
+    return {"status": "UP", "sources": ["Ses Kocaeli", "Özgür Kocaeli"]}
 
 @app.post("/process-news")
 async def process_news(days: int = Query(3, ge=1, le=3)):
     all_raw_news = []
+    # Çağdaş bloklu olduğu için şimdilik çıkarıldı, Özgür eklendi
+    scrapers = [SesKocaeliScraper(), OzgurKocaeliScraper()]
     
-    # Tüm Scraper'lar
-    scrapers = [
-        OzgurKocaeliScraper(),
-        CagdasKocaeliScraper(),
-        SesKocaeliScraper(),
-        YeniKocaeliScraper(),
-        BizimYakaScraper()
-    ]
-    
-    print(f"[Worker] {len(scrapers)} site taranıyor...")
+    print(f"\n[Worker] {len(scrapers)} haber kaynağı taranıyor (Son {days} gün)...")
     
     for s in scrapers:
         try:
@@ -44,25 +36,38 @@ async def process_news(days: int = Query(3, ge=1, le=3)):
     if not all_raw_news:
         return {"status": "success", "processed_count": 0, "results": []}
 
-    # NLP İşleme Hattı
-    processed_news = []
+    # 1. Temizleme ve Lokalite Filtresi
+    processed_stage_1 = []
     for news in all_raw_news:
-        # Temizle
-        news['content'] = cleaner.clean_html(news['content'])
-        # Akıllı Konum Çıkar (Mahalle + Cadde + İlçe)
-        news['addressText'] = processor.extract_location(news['content'])
-        # Kategori Sınıflandır
-        news['category'] = processor.classify(news['content'])
-        processed_news.append(news)
+        news['content'] = cleaner.process(news['content'])
+        extracted_loc = processor.extract_location(f"{news['title']} {news['content']}")
         
-    # Benzerlik Analizi (%85 eşik ile grupla)
-    final_news = processor.check_similarity(processed_news, threshold=0.85)
+        if extracted_loc is None:
+            continue
+            
+        news['addressText'] = extracted_loc
+        news['category'] = processor.classify(news['title'], news['content'])
+        processed_stage_1.append(news)
+        
+    print(f"[Worker] Lokalite filtresinden geçen haber sayısı: {len(processed_stage_1)}")
+
+    # 2. Benzerlik Analizi ve Tekilleştirme (Threshold: %75)
+    final_results, merge_logs = processor.check_similarity(processed_stage_1, threshold=0.75)
+    
+    # Başarılı birleşmeleri logla
+    log_dir = "worker-service/logs"
+    os.makedirs(log_dir, exist_ok=True)
+    with open(os.path.join(log_dir, "successful_merges.json"), "w", encoding="utf-8") as f:
+        json.dump(merge_logs, f, ensure_ascii=False, indent=4)
+
+    print(f"[Worker] Tekilleştirme bitti. {len(merge_logs)} olay birleştirildi.")
     
     return {
         "status": "success",
-        "processed_count": len(final_news),
-        "results": final_news
+        "processed_count": len(final_results),
+        "results": final_results,
+        "merges": merge_logs
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

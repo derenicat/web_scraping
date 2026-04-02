@@ -1,4 +1,4 @@
-const HaberService = require('../services/haberService');
+const haberService = require('../services/haberService');
 
 class HaberController {
     /**
@@ -7,27 +7,30 @@ class HaberController {
     async scrapeNews(req, res) {
         try {
             const { days } = req.body;
-            const result = await HaberService.triggerScrape(days || 3);
+            // PDF isteri: Son 3 günlük zaman dilimine göre veri çekilmelidir.
+            const result = await haberService.triggerScrapeAndProcess(days || 3);
             res.status(200).json(result);
         } catch (error) {
-            res.status(500).json({ error: 'Scraping süreci başlatılamadı.', message: error.message });
+            res.status(500).json({ 
+                error: 'Scraping ve entegrasyon süreci başarısız.', 
+                message: error.message 
+            });
         }
     }
 
     /**
-     * Harita üzerinde gösterilecek tüm haberleri getirir.
+     * Veritabanındaki tüm haberleri getirir.
      */
     async listNews(req, res) {
         try {
             const filters = {
                 category: req.query.category,
-                startDate: req.query.startDate,
-                endDate: req.query.endDate
+                days: req.query.days ? parseInt(req.query.days) : null
             };
-            const news = await HaberService.getAllNews(filters);
+            const news = await haberService.listAllNews(filters);
             res.status(200).json(news);
         } catch (error) {
-            res.status(500).json({ error: 'Haberler listelenemedi.', message: error.message });
+            res.status(500).json({ error: 'Haber listeleme hatası.', message: error.message });
         }
     }
 }

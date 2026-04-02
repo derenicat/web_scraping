@@ -14,6 +14,13 @@ worker-service/nlp/__pycache__/
 worker-service/scrapers/__pycache__/
 worker-service/utils/__pycache__/
 
+# Developer Specific (Logs & Backups)
+worker-service/logs/
+worker-service/scrapers/backup/
+worker-service/raw_discovery/
+worker-service/*.py
+!worker-service/main.py
+
 # Build / IDE
 dist/
 .vscode/

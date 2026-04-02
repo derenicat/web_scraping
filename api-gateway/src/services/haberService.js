@@ -1,66 +1,74 @@
 const axios = require('axios');
-const HaberRepository = require('../repositories/haberRepository');
+const haberRepository = require('../repositories/haberRepository');
 require('dotenv').config();
 
 class HaberService {
     constructor() {
-        this.workerUrl = process.env.PYTHON_WORKER_URL || 'http://localhost:8000';
+        this.workerUrl = process.env.PYTHON_WORKER_URL || 'http://localhost:8001';
         this.googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
     }
 
     /**
-     * Python Worker'ı tetikleyerek haber çekme sürecini başlatır.
+     * Python Worker'ı tetikler ve gelen verileri işleyip DB'ye kaydeder.
      */
-    async triggerScrape(days) {
+    async triggerScrapeAndProcess(days) {
         try {
-            console.log(`[Service] Python Worker tetikleniyor: ${days} gün...`);
+            console.log(`[HaberService] Python Worker tetikleniyor: ${days} gün...`);
             const response = await axios.post(`${this.workerUrl}/process-news?days=${days}`);
             
             if (response.data.status === 'success') {
-                const rawNews = response.data.results;
-                console.log(`[Service] ${rawNews.length} adet ham haber geldi. Geocoding başlıyor...`);
+                const newsList = response.data.results;
+                console.log(`[HaberService] ${newsList.length} adet olay geldi. Geocoding süreci başlıyor...`);
                 
-                // Her haber için koordinat tespiti yap
-                const processedNews = await Promise.all(rawNews.map(async (news) => {
+                const processedNews = [];
+                
+                for (const news of newsList) {
                     const coords = await this.getCoordinates(news.addressText);
-                    return {
-                        ...news,
-                        location: {
-                            type: 'Point',
-                            coordinates: coords || [29.9408, 40.7654] // Bulunamazsa Kocaeli Merkez (Fallback)
-                        }
-                    };
-                }));
+                    
+                    // Eğer konum bulunamazsa PDF isteri gereği haberi haritada göstermeyeceğiz (kaydetmeyeceğiz).
+                    if (coords) {
+                        processedNews.push({
+                            ...news,
+                            location: {
+                                type: 'Point',
+                                coordinates: coords // [lng, lat]
+                            }
+                        });
+                    }
+                }
 
-                // Veritabanına kaydet (Repository Pattern)
-                const result = await HaberRepository.createOrUpdate(processedNews);
-                return { success: true, count: rawNews.length, dbResult: result };
+                // Toplu kayıt (Repository üzerinden)
+                const result = await haberRepository.bulkUpsert(processedNews);
+                console.log(`[HaberService] İşlem tamamlandı. DB Sonucu: ${result.upsertedCount} yeni, ${result.matchedCount} güncellenen.`);
+                
+                return { success: true, count: processedNews.length, db: result };
             }
-            
-            throw new Error('Python Worker hata döndü.');
+            throw new Error('Python Worker servisi hata döndü.');
         } catch (error) {
-            console.error('[Service Error] Scraping hatası:', error.message);
+            console.error('[HaberService Hata]:', error.message);
             throw error;
         }
     }
 
     /**
-     * Adres metnini koordinatlara çevirir. 
-     * Önce DB Cache'e bakar, yoksa Google Maps'e gider.
+     * Adres metnini koordinata çevirir (With Caching).
      */
     async getCoordinates(addressText) {
-        if (!addressText || addressText === "Kocaeli") return [29.9408, 40.7654];
+        if (!addressText) return null;
 
-        // 1. Önce DB'den kontrol et (Location Caching)
-        const cachedCoords = await HaberRepository.findCoordinatesByAddress(addressText);
-        if (cachedCoords) {
-            console.log(`[Cache Hit] ${addressText} için koordinatlar DB'den alındı.`);
-            return cachedCoords;
+        // 1. Kocaeli Merkez Sabiti
+        if (addressText.toLowerCase() === "kocaeli") return [29.9408, 40.7654];
+
+        // 2. DB Cache Kontrolü
+        const cached = await haberRepository.findCoordinatesByAddress(addressText);
+        if (cached) {
+            console.log(`   [GeoCache Hit] ${addressText}`);
+            return cached;
         }
 
-        // 2. DB'de yoksa Google Geocoding API'ye git
+        // 3. Google Geocoding API
         try {
-            console.log(`[Geocoding API] ${addressText} için Google'a soruluyor...`);
+            console.log(`   [GeoAPI Call] ${addressText} için Google'a soruluyor...`);
             const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressText + ', Kocaeli')}&key=${this.googleApiKey}`;
             const response = await axios.get(url);
 
@@ -69,17 +77,17 @@ class HaberService {
                 return [lng, lat];
             }
         } catch (error) {
-            console.error('[Geocoding Error]:', error.message);
+            console.error(`   [GeoAPI Hata] ${addressText}:`, error.message);
         }
 
         return null;
     }
 
     /**
-     * Haberleri listeleme mantığı.
+     * Haberleri filtreli getirir.
      */
-    async getAllNews(filters) {
-        return await HaberRepository.findAll(filters);
+    async listAllNews(filters) {
+        return await haberRepository.findAll(filters);
     }
 }
 

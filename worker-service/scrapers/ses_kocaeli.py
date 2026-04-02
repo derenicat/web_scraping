@@ -5,49 +5,72 @@ from datetime import datetime
 class SesKocaeliScraper(BaseScraper):
     def __init__(self):
         super().__init__("Ses Kocaeli", "https://www.seskocaeli.com")
+        self.endpoints = [
+            "/kocaeli-son-dakika-haberler",
+            "/kocaeli-asayis-haberleri"
+        ]
 
     def scrape(self, days=3):
-        news_list = []
-        url = f"{self.base_url}/asayis" # Ses Kocaeli asayiş yolu
+        all_news = []
+        news_urls = set()
+
+        for endpoint in self.endpoints:
+            print(f"[{self.site_name}] '{endpoint}' taranıyor...")
+            html = self.fetch_url(endpoint)
+            if not html: continue
+            
+            soup = BeautifulSoup(html, "html.parser")
+            links = soup.select(".post h3.b a")
+            links += soup.select("ul.list.t-2 li a")
+
+            for link in links:
+                href = link.get("href")
+                if href and "/haber/" in href:
+                    news_url = self.base_url + href if href.startswith("/") else href
+                    if news_url not in news_urls:
+                        news_urls.add(news_url)
+                        detail = self.scrape_detail(news_url, days)
+                        if detail:
+                            all_news.append(detail)
+                            print(f"   -> [Yeni Haber] {detail['title'][:50]}...")
+        return all_news
+
+    def scrape_detail(self, url, days):
         html = self.fetch_url(url)
-        if not html: return []
-        
+        if not html: return None
         soup = BeautifulSoup(html, "html.parser")
-        all_links = soup.find_all("a", href=True)
         
-        for link in all_links:
-            href = link['href']
-            # Haber detay linki kontrolü
-            if "/haber/" in href and (href.startswith("/") or self.base_url in href):
-                news_url = self.base_url + href if href.startswith("/") else href
-                if any(n['url'] == news_url for n in news_list): continue
-                
-                title = link.get_text(strip=True)
-                if len(title) < 20: continue
-                
-                news_html = self.fetch_url(news_url)
-                if not news_html: continue
-                news_soup = BeautifulSoup(news_html, "html.parser")
-                
-                time_tag = news_soup.find("time")
-                news_date = datetime.now()
-                if time_tag and time_tag.has_attr('datetime'):
-                    try:
-                        news_date = datetime.fromisoformat(time_tag['datetime'].replace("Z", "+00:00")).replace(tzinfo=None)
-                    except: pass
-                
-                if not self.is_within_days(news_date, days): continue
-                
-                content_tag = news_soup.select_one(".content-text") or news_soup.select_one("article")
-                if not content_tag: continue
-                
-                news_list.append({
-                    "title": title,
-                    "content": content_tag.get_text(strip=True),
-                    "publishedDate": news_date,
-                    "url": news_url,
-                    "siteName": self.site_name,
-                    "addressText": "Kocaeli"
-                })
-                if len(news_list) >= 5: break
-        return news_list
+        published_date = self.parse_date(soup)
+        if not self.is_within_days(published_date, days):
+            return None
+
+        title_tag = soup.find("h1")
+        title = self.clean_text(title_tag.get_text()) if title_tag else "Başlıksız"
+
+        content_div = soup.find("div", id="main-text")
+        if content_div:
+            # KRİTİK DÜZELTME: .tag-link içindeki metni koru (Mahallesi, Kocaeli vb.)
+            for tag in content_div.select(".tag-link"):
+                tag.unwrap() # Etiketi kaldır ama metni bırak
+            
+            # Sadece kesin çöp olanları sil
+            for junk in content_div.select(".google-news-button, .entry-share, .ad-channel, script, style"):
+                junk.decompose()
+            
+            paragraphs = content_div.find_all("p")
+            content = " ".join([p.get_text() for p in paragraphs])
+            content = self.clean_text(content)
+        else:
+            content = ""
+
+        if not content or len(content) < 50:
+            return None
+
+        return {
+            "title": title,
+            "content": content,
+            "publishedDate": published_date,
+            "url": url,
+            "siteName": self.site_name,
+            "addressText": "Kocaeli"
+        }
