@@ -6,7 +6,7 @@ from typing import List, Dict, Optional
 
 class NLPProcessor:
     def __init__(self):
-        print("[NLP] Gelişmiş Lokal Modeller yükleniyor...")
+        print("[NLP] Katı Lokalite Modelleri yükleniyor...")
         try:
             self.nlp = spacy.load("tr_core_news_lg")
         except:
@@ -15,40 +15,19 @@ class NLPProcessor:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.embed_model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', device=self.device)
 
+        # KOCAELİ İLÇELERİ (DOĞRULAMA ANAHTARIDIR)
         self.districts = ["Başiskele", "Çayırova", "Darıca", "Derince", "Dilovası", "Gebze", "Gölcük", "İzmit", "Kandıra", "Karamürsel", "Kartepe", "Körfez"]
+        
+        # Dış İller (Eleme Listesi)
+        self.other_cities = ["Bursa", "Aydın", "İstanbul", "Sakarya", "Yalova", "Düzce", "Bolu", "Ankara", "İzmir"]
 
-        # GELİŞMİŞ NİŞ ANAHTAR KELİMELER VE PUANLAMA
         self.categories = {
-            'Cinayet': {
-                'strong': ['cinayet', 'öldürüldü', 'infaz', 'ceset bulundu', 'kurşun yağmuru', 'boğazı kesildi', 'kan davası', 'kanlı saldırı',"Faili meçhul","cinayete kurban gitti"],
-                'weak': ['ateş açıldı', 'silahlı saldırı', 'kanlar içinde', 'hayatını kaybetti', 'operasyon'],
-                'negative': ['maç', 'gol', 'kaza', 'yangın']
-            },
-            'Yangın': {
-                'strong': ['yangın çıktı', 'itfaiye ekipleri', 'alevler yükseldi', 'dumanlar yükseldi', 'soğutma çalışması', 'kontrol altına alındı', 'alevlere teslim',"Kül oldu"],
-                'weak': ['tutuştur',"tutuştu", 'patlama', 'şofben', 'orman yangını', 'ev yangını', 'itfaiye müdahale',"yangın"],
-                'negative': ['denetim', 'ziyaret', 'kaza']
-            },
-            'Trafik Kazası': {
-                'strong': ['trafik kazası', 'zincirleme kaza', 'direksiyon hakimiyeti', 'şarampole devrildi', 'kafa kafaya çarpıştı', 'plakalı otomobil', 'çarpıp kaçtı', 'yaya geçidi'],
-                'weak': ['kaza', 'çarpışma', 'çarpıştı', "çarptı", 'yaralılar var', 'motosiklet kazası', 'tır devrildi', 'araç içinde sıkıştı', 'bariyerlere çarptı',"altında kaldı","servis","kör nokta"],
-                'negative': ['ötv', 'vergi', 'ihale', 'cinayet', 'yangın']
-            },
-            'Hırsızlık': {
-                'strong': ['hırsızlık', 'soygun', 'ziynet eşyası', 'kasayı boşalttı', 'yankesicilik', 'dolandırıcılık', 'çalındı', 'yağma',],
-                'weak': ['şüpheli yakalandı', 'gözaltına alındı', 'polis baskını', 'asayiş uygulaması', 'ele geçirildi', 'hırsız', 'soyguncu', 'dolandırıcı', 'yankesici',"Suçüstü yakalandı"],
-                'negative': ['etkinlik', 'belediye', 'spor', 'kaza']
-            },
-            'Elektrik Kesintisi': {
-                'strong': ['elektrik kesintisi', 'planlı kesinti', 'bakım çalışması nedeniyle', 'elektriksiz kalacak', 'sedaş duyurdu'],
-                'weak': ['elektrik arıza', 'trafo patlaması', 'karanlığa gömüldü'],
-                'negative': ['cinayet', 'kaza']
-            },
-            'Kültürel Etkinlikler': {
-                'strong': ['konser', 'tiyatro oyunu', 'sergi açılışı', 'festival heyecanı', 'kültür sanat merkezi', 'açılış töreni', 'konferans'],
-                'weak': ['etkinlik düzenlendi', 'panel', 'sanatseverler', 'ziyaret etti', 'buluşma',"buluştu", 'heyet', 'protokol', 'katıldı','gösteri', 'sahne aldı',"kültür"],
-                'negative': ['kaza', 'cinayet', 'yangın', 'soygun']
-            }
+            'Cinayet': {'strong': ['cinayet', 'öldürüldü', 'infaz', 'ceset bulundu', 'kurşun yağmuru', 'kan davası', 'kanlı saldırı'], 'weak': ['ateş açıldı', 'silahlı saldırı', 'kanlar içinde'], 'negative': ['maç', 'gol', 'kaza', 'yangın']},
+            'Yangın': {'strong': ['yangın çıktı', 'itfaiye ekipleri', 'alevler yükseldi', 'dumanlar yükseldi', 'soğutma çalışması', 'alevlere teslim'], 'weak': ['tutuştur', 'patlama', 'şofben', 'orman yangını'], 'negative': ['denetim', 'ziyaret', 'kaza']},
+            'Trafik Kazası': {'strong': ['trafik kazası', 'zincirleme kaza', 'direksiyon hakimiyeti', 'şarampole devrildi', 'kafa kafaya çarpıştı', 'plakalı otomobil', 'çarpıp kaçtı'], 'weak': ['kaza', 'çarpışma', 'yaralılar var', 'motosiklet kazası', 'bariyerlere çarptı'], 'negative': ['ötv', 'vergi', 'ihale', 'cinayet', 'yangın']},
+            'Hırsızlık': {'strong': ['hırsızlık', 'soygun', 'ziynet eşyası', 'kasayı boşalttı', 'yankesicilik', 'dolandırıcılık', 'çalındı'], 'weak': ['şüpheli yakalandı', 'gözaltına alındı', 'polis baskını'], 'negative': ['etkinlik', 'belediye', 'spor', 'kaza']},
+            'Elektrik Kesintisi': {'strong': ['elektrik kesintisi', 'planlı kesinti', 'bakım çalışması nedeniyle', 'elektriksiz kalacak'], 'weak': ['elektrik arıza', 'trafo patlaması'], 'negative': ['cinayet', 'kaza']},
+            'Kültürel Etkinlikler': {'strong': ['konser', 'tiyatro oyunu', 'sergi açılışı', 'festival heyecanı', 'kültür sanat merkezi', 'açılış töreni', 'konferans'], 'weak': ['etkinlik düzenlendi', 'panel', 'konferans', 'sanatseverler', 'ziyaret etti', 'buluşma'], 'negative': ['kaza', 'cinayet', 'yangın', 'soygun']}
         }
 
     def classify(self, title: str, content: str) -> str:
@@ -57,22 +36,66 @@ class NLPProcessor:
         for cat_name, keywords in self.categories.items():
             score = 0
             for word in keywords['strong']:
-                if word in text: score += 20 # Güçlü kelime ağırlığı 20'ye çıktı
+                if word in text: score += 20
             for word in keywords['weak']:
                 if word in text: score += 5
             for word in keywords['negative']:
-                if word in text: score -= 25 # Negatif filtre daha sert
+                if word in text: score -= 25
             if score > 0: scores[cat_name] = score
-        
         if not scores: return "Diğer"
         sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        # Baraj puanı 10'a yükseltildi (Kesinlik için)
         return sorted_scores[0][0] if sorted_scores[0][1] >= 10 else "Diğer"
 
     def extract_location(self, text: str) -> Optional[str]:
-        for d in self.districts:
-            if d.lower() in text.lower(): return f"{d}, Kocaeli"
-        return "Kocaeli" if "kocaeli" in text.lower() else None
+        """Kocaeli sınırları içerisinde en spesifik adresi çıkarır."""
+        text_lower = text.lower()
+        
+        # 1. KOCAELİ DOĞRULAMASI (Kritik Filtre)
+        # Eğer metinde Kocaeli'ye ait bir ilçe veya "Kocaeli" geçmiyorsa haber dışarıdandır.
+        found_districts = [d for d in self.districts if d.lower() in text_lower]
+        is_kocaeli_mention = "kocaeli" in text_lower
+        
+        # Bursa, Aydın gibi başka iller geçiyorsa ve Kocaeli ilçesi yoksa direkt ele
+        found_other_cities = [c for c in self.other_cities if c.lower() in text_lower]
+        if found_other_cities and not found_districts:
+            return None # Kocaeli dışı haber
+
+        if not found_districts and not is_kocaeli_mention:
+            return None # Kocaeli ile bağı yok
+
+        # 2. Mikro-Lokasyon Regex Taraması
+        micro_patterns = [
+            r"([A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s?)+ (Mahallesi|Caddesi|Sokak|Bulvarı|Mevkii|Kavşağı|Tesisleri|Camii|Yolu|Giseleri|Stadyumu)",
+            r"([A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s?)+(Parkı|Bahçesi|Meydanı|Köprüsü|Tüneli|Durağı)"
+        ]
+        
+        found_locations = []
+        for pattern in micro_patterns:
+            matches = re.finditer(pattern, text)
+            for match in matches:
+                loc_text = match.group(0).strip()
+                if len(loc_text) > 5:
+                    found_locations.append(loc_text)
+
+        # 3. Sonuç Birleştirme
+        if found_locations:
+            best_loc = max(found_locations, key=len)
+            
+            # Eğer bulunan lokasyon Bursa/Aydın gibi bir yerdeyse (Context check)
+            # Bizim ilçelerimizden biriyle beraber geçiyorsa Kocaeli'dir.
+            district_prefix = ""
+            if found_districts:
+                district_prefix = f"{found_districts[0]}, "
+            
+            return f"{best_loc}, {district_prefix}Kocaeli"
+
+        if found_districts:
+            return f"{found_districts[0]}, Kocaeli"
+
+        if is_kocaeli_mention:
+            return "Kocaeli"
+            
+        return None
 
     def check_similarity(self, news_list: List[Dict], threshold: float = 0.75) -> tuple[List[Dict], List[Dict]]:
         if not news_list: return [], []

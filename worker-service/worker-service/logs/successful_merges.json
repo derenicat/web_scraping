@@ -2,44 +2,110 @@
     {
         "score": 1.0,
         "news_a": {
-            "title": "Başiskele Kart uygulaması 4 bine yakın kullanıcıya ulaştı",
+            "title": "Hastanede deprem farkındalığı etkinliği",
             "site": "Ses Kocaeli"
         },
         "news_b": {
-            "title": "Başiskele Kart uygulaması 4 bine yakın kullanıcıya ulaştı",
+            "title": "Hastanede deprem farkındalığı etkinliği",
             "site": "Yeni Kocaeli"
         }
     },
     {
-        "score": 1.0,
+        "score": 0.9032,
         "news_a": {
-            "title": "Gebze'de çöken bina için yeni rapor",
+            "title": "İzmit Belediyesi araç filosunu büyüttü",
             "site": "Ses Kocaeli"
         },
         "news_b": {
-            "title": "Gebze'de çöken bina için yeni rapor",
+            "title": "İzmit Belediyesi araç filosunu büyüttü Hedef 2027’de 400 araç",
             "site": "Yeni Kocaeli"
         }
     },
     {
-        "score": 0.8609,
+        "score": 0.7872,
         "news_a": {
-            "title": "Çiğdem Öğretmen'den acı haber!",
+            "title": "Çenesuyu'na zam geldi!",
             "site": "Ses Kocaeli"
         },
         "news_b": {
-            "title": "İzmit'te görev yapan öğretmenden kahreden haber!",
+            "title": "Çenesuyu’na bir zam daha geldi",
             "site": "Özgür Kocaeli"
         }
     },
     {
         "score": 1.0,
         "news_a": {
+            "title": "Başiskele Kart uygulaması 4 bine yakın kullanıcıya ulaştı",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Başiskele Kart uygulaması 4 bine yakın kullanıcıya ulaştı",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 1.0,
+        "news_a": {
+            "title": "Gebze'de çöken bina için yeni rapor",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Gebze'de çöken bina için yeni rapor",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.8835,
+        "news_a": {
+            "title": "Çiğdem Öğretmen'den acı haber!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "İzmitli öğretmen genç yaşta yakalandığı hastalığa yenik düştü!",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 1.0,
+        "news_a": {
             "title": "Kocaeli'nin fazla suyu Sapanca Gölü'ne gönderiliyor",
             "site": "Ses Kocaeli"
         },
         "news_b": {
             "title": "Kocaeli'nin fazla suyu Sapanca Gölü'ne gönderiliyor",
+            "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.8167,
+        "news_a": {
+            "title": "Kamyondan düşen tomruk otomobile saplandı!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "İzmit’te dev kütük arabanın camına saplandı!",
+            "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 0.8378,
+        "news_a": {
+            "title": "Kamyondan düşen tomruk otomobile saplandı!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "İzmit'te tomruk yüklü kamyondan fırlayan kütük otomobile saplandı: Sürücü yaralandı",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 0.9692,
+        "news_a": {
+            "title": "Kamyondan düşen tomruk otomobile saplandı!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Kamyondan düşen tomruk seyir halindeki otomobile saplandı",
             "site": "Yeni Kocaeli"
         }
     },
@@ -52,6 +118,39 @@
         "news_b": {
             "title": "Değirmendere’de iki kız çocuğu kayıp",
             "site": "Özgür Kocaeli"
+        }
+    },
+    {
+        "score": 0.7608,
+        "news_a": {
+            "title": "Uyuşturucu satıcısı Başiskele'de yakalandı!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "İzmit'te narkotik operasyonu: 8 yıl hapisle aranan zehir taciri yakalandı!",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 0.8005,
+        "news_a": {
+            "title": "Uyuşturucu satıcısı Başiskele'de yakalandı!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Kartepe’de uyuşturucu tacirine darbe: 4 yıllık firari kıskıvrak yakalandı!",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 0.77,
+        "news_a": {
+            "title": "İflas açıklayan otomotiv firmasının mağdurlarından suç duyurusu",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Darıca'da araç satışı iddiasında kriz: Mağdurlar adliyeye gitti, firmadan \"yurt dışına çıktık\" açıklaması",
+            "site": "Çağdaş Kocaeli"
         }
     },
     {
@@ -110,25 +209,69 @@
         }
     },
     {
-        "score": 0.8179,
+        "score": 0.7602,
         "news_a": {
-            "title": "İzmit’te dev kütük arabanın camına saplandı!",
+            "title": "17 yaşındaki genci öldüren şahıs tutuklandı!",
+            "site": "Ses Kocaeli"
+        },
+        "news_b": {
+            "title": "Kocaeli'de 17 yaşındaki Deniz'i öldüren zanlı tutuklandı",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 0.7507,
+        "news_a": {
+            "title": "Kardeşini pusu kurarak öldürmüştü, tutuklandı",
             "site": "Özgür Kocaeli"
         },
         "news_b": {
-            "title": "Kamyondan düşen tomruk seyir halindeki otomobile saplandı",
+            "title": "Kocaeli'de pusu kurup kardeşini öldüren ağabey tutuklandı",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 0.8809,
+        "news_a": {
+            "title": "Kardeşini pusu kurarak öldürmüştü, tutuklandı",
+            "site": "Özgür Kocaeli"
+        },
+        "news_b": {
+            "title": "Kardeşini pusu kurup öldüren şüpheli tutuklandı",
             "site": "Yeni Kocaeli"
         }
     },
     {
-        "score": 1.0,
+        "score": 0.8508,
         "news_a": {
-            "title": "“Ortak Akılla Daha Güçlü Derince”",
-            "site": "Yeni Kocaeli"
+            "title": "Cesedi ormana gömüp mahkemede birbirini suçladılar!",
+            "site": "Özgür Kocaeli"
         },
         "news_b": {
-            "title": "“Ortak Akılla Daha Güçlü Derince”",
+            "title": "Kocaeli'de Serdar Arslan cinayetinde karar: 2 sanığa ağırlaştırılmış müebbet",
+            "site": "Çağdaş Kocaeli"
+        }
+    },
+    {
+        "score": 0.9351,
+        "news_a": {
+            "title": "Cesedi ormana gömüp mahkemede birbirini suçladılar!",
+            "site": "Özgür Kocaeli"
+        },
+        "news_b": {
+            "title": "Cesedi ormana gömüp mahkemede birbirini suçlayan kardeşler cezadan kurtulamadı",
             "site": "Yeni Kocaeli"
+        }
+    },
+    {
+        "score": 0.8075,
+        "news_a": {
+            "title": "Kocaeli Polisi'nden 'Fuhuş' operasyonu: 15 yıl hapisle aranan firari yakalandı!",
+            "site": "Çağdaş Kocaeli"
+        },
+        "news_b": {
+            "title": "Kocaeli Emniyeti'nden nokta operasyon: Yol kesen firari yakalandı",
+            "site": "Çağdaş Kocaeli"
         }
     }
 ]
